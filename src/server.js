@@ -17,10 +17,12 @@ import handleServerRendering from "./server/handleServerRendering";
 import setLocale from "./server/setLocale";
 
 const staticPath = path.resolve(__dirname, "../static");
+const assetsDir = path.resolve(__dirname, "../static/assets");
 
 // Initialize express server
 export default function(callback) {
   const server = express();
+  console.log(assetsDir);
 
   server.set("env", process.env.NODE_ENV || "development");
   server.set("host", process.env.HOST || "0.0.0.0");
@@ -31,6 +33,8 @@ export default function(callback) {
   server.use(cookieParser());
   server.use(compression());
   server.use(serveFavicon(`${staticPath}/assets/favicon.png`));
+
+  server.use("/assets", express.static(assetsDir, { maxAge: 365 * 24 * 60 * 60 } ));
 
   // Set the default locale
 
@@ -54,6 +58,7 @@ export default function(callback) {
   const fetchr = app.getPlugin("FetchrPlugin");
   fetchr.registerService(require("./services/photos"));
   fetchr.registerService(require("./services/photo"));
+  fetchr.registerService(require("./services/findService"));
 
   // Use the fetchr middleware (will enable requests from /api)
 
